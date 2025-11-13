@@ -352,4 +352,4 @@ __pycache__/        # Python 캐시 파일
 # data 업로드 제한
 data
 claude.md
-claude.md
+DATA_STRUCTURE.md
