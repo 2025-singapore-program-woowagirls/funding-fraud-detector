@@ -1,0 +1,5 @@
+feature_name,description,normal_range,suspicious_range,high_risk_range,data_median,data_95th,interpretation,data_10th,data_mean
+funding_fee_abs,펀딩피 절댓값,< $5,$5 ~ $30,> $30,0.27687069138069387,30.882042770449544,"0 근처가 정상, 큰 값은 펀딩피를 노린 거래",,
+mean_holding_minutes,평균 포지션 보유시간,> 60분,30~60분,< 30분,165.83798113049068,,짧을수록 펀딩피만 노리는 패턴,10.750599831880187,
+funding_timing_ratio,펀딩 시각(±30분) 거래 비율,< 30%,30~50%,> 50%,,0.5280381235895711,펀딩 시각에만 집중하면 차익거래 의심,,0.29424025452583225
+funding_profit_ratio,펀딩피 / 총수익 비율,< 30%,30~70%,> 70%,0.0,0.26009538783448144,비중이 높을수록 펀딩피 의존형 거래,,

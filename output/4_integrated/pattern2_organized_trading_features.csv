@@ -1,0 +1,5 @@
+feature_name,description,normal_range,suspicious_range,high_risk_range,data_mean,data_median,interpretation,data_95th
+ip_shared_ratio,IP 공유 비율 (다른 계정과 IP 중복),0%,> 30%,> 50%,0.01578091456816635,0.0,공유 비율 높으면 다계정 운영 가능성,
+concurrent_trading_ratio,동시 거래 비율 (같은 시간·심볼 거래),< 30%,30~50%,> 50%,0.13835513707567343,,비율 높으면 조직적으로 거래하는 패턴,0.5830154343870053
+price_similarity_ratio,동시 거래 중 가격 유사 비율 (CV<1%),< 60%,60~80%,> 80%,0.9776714102935435,1.0,동일 가격대 거래는 조직적 패턴,
+mean_leverage,평균 레버리지,< 30x,30~50x,> 50x,23.345141210133445,15.32198712051518,고레버리지는 공격적 거래 전략,

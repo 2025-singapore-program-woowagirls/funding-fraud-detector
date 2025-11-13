@@ -1,0 +1,5 @@
+feature_name,description,normal_range,suspicious_range,high_risk_range,data_median,data_95th,interpretation,data_count_shared,data_count_unique,data_count_active,data_count_inactive
+total_reward,총 보너스 수령액,< $50,$50~$100,> $100,40.0,584.8055135833333,금액 높으면 다계정으로 반복 수령,,,,
+shared_ip,보너스 수령 시 IP 공유 여부,False,-,True,,,IP 공유는 다계정 생성의 강력한 신호,8.0,41.0,,
+has_trades,보너스 수령 후 거래 활동 여부,True (활발한 거래),거래 < 10회,False (비활성),,,보너스만 받고 거래 안 하면 악용,,,49.0,0.0
+reward_to_volume_ratio,보너스 / 거래량 비율,< 0.0001,0.0001~0.001,> 0.001,6.97721006022098e-06,0.0007562440969620275,비율 높으면 보너스만 목적,,,,
