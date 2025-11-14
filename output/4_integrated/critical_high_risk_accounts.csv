@@ -1,2 +1,0 @@
-account_id,funding_arbitrage_score,organized_trading_score,bonus_abuse_score,quant_anomaly_score,mean_holding_minutes,funding_timing_ratio,concurrent_trading_ratio,ip_shared_ratio,total_reward,sharpe_ratio,win_rate,final_risk_score,final_risk_level,pattern_count
-A_d444580218,0.6826133422874617,0.609375,0.555037908497751,0.0,6.954663085015291,0.8727272727272727,0.865909090909091,0.25,336.89586676478524,-1.590580526681652,0.6055045871559633,0.5290728343857887,High,3
