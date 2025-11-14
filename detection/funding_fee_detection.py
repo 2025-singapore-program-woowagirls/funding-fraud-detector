@@ -80,13 +80,13 @@ merged = pd.concat([
 ], axis=1).fillna(0)
 
 # ======================================================
-# 7. Z-score 정규화 (피처 간 스케일 통일)
+# 7. Z-score 정규화
 # ======================================================
 features = ['funding_fee_abs', 'mean_holding', 'funding_timing', 'funding_profit_ratio']
 merged_z = merged[features].apply(zscore).fillna(0)
 
 # ======================================================
-# 8. 상관 기반 가중치 유지
+# 8. 가중 평균 기반 Funding_Score
 # ======================================================
 merged['Funding_Score'] = (
     0.15 * merged_z['funding_fee_abs'] +
@@ -96,25 +96,25 @@ merged['Funding_Score'] = (
 )
 
 # ======================================================
-# 9. 펀딩 행동 없는 계정 감점
+# 9. 펀딩 참여 없는 계정 감점
 # ======================================================
 funding_participation = funding_df.groupby('account_id')['funding_fee'].apply(lambda x: abs(x).sum())
 participation_aligned = funding_participation.reindex(merged.index).fillna(0)
 merged['Funding_Score'] *= np.where(participation_aligned > 0, 1.0, 0.5)
 
 # ======================================================
-# 10. Risk Level 분류 (Z-score + 분위수)
+# 10. Risk Level 분류
 # ======================================================
 high_thresh = max(1.0, merged['Funding_Score'].quantile(0.85))
 medium_thresh = 0
 
 def classify(score):
     if score >= high_thresh:
-        return 'High'
+        return '높음'
     elif score >= medium_thresh:
-        return 'Medium'
+        return '중간'
     else:
-        return 'Low'
+        return '낮음'
 
 merged['Risk_Level'] = merged['Funding_Score'].apply(classify)
 
@@ -126,70 +126,55 @@ merged['Funding_Profit_USD'] = merged.index.map(account_funding).fillna(0)
 merged['Total_Profit_USD'] = merged['Trading_PnL_USD'] + merged['Funding_Profit_USD']
 
 # ======================================================
-# 12. 결과 정렬
+# 12. 결과 정렬 및 초과 수익 계산
 # ======================================================
 merged_sorted = merged.sort_values(by='Funding_Score', ascending=False)
 merged_sorted['Rank'] = np.arange(1, len(merged_sorted) + 1)
-
-# ======================================================
-# 13. 초과 수익 (Excess Profit)
-# ======================================================
 merged_sorted['Excess_Profit'] = zscore(merged_sorted['Total_Profit_USD'].fillna(0))
 
 # ======================================================
-# 14. 리스크-수익 비율
-# ======================================================
-merged_sorted['Risk_Reward_Ratio'] = merged_sorted['Total_Profit_USD'] / (merged_sorted['Funding_Score'].abs() + 1e-6)
-
-# ======================================================
-# 15. 해석(Interpretation)
-# ======================================================
-def interpret(row):
-    if row['Risk_Level'] == 'High' and row['Excess_Profit'] > 1.0:
-        return "리스크가 높고 초과수익도 커서 조작 가능성 높음"
-    elif row['Risk_Level'] == 'High' and row['Excess_Profit'] <= 0:
-        return "리스크는 높지만 수익은 낮아 실패형 패턴"
-    elif row['Risk_Level'] == 'Medium' and row['Excess_Profit'] > 0.5:
-        return "중간 수준 리스크에서 안정적 초과수익"
-    elif row['Risk_Level'] == 'Low' and row['Excess_Profit'] > 0.5:
-        return "정상 거래로도 높은 수익을 기록함"
-    else:
-        return "일반적인 거래 패턴"
-
-merged_sorted['해석'] = merged_sorted.apply(interpret, axis=1)
-
-# ======================================================
-# 16. 최종 출력
-# ======================================================
-final_columns = [
-    'Rank', 'Funding_Score', 'Risk_Level',
-    'Funding_Profit_USD', 'Trading_PnL_USD', 'Total_Profit_USD',
-    'Excess_Profit', 'Risk_Reward_Ratio', '해석'
-]
-
-# ======================================================
-# 17. 리스크-수익 조합 기반 행동 분류
+# 13. 해석 로직
 # ======================================================
 def interpret(row):
     score = row['Funding_Score']
-    profit = row['Total_Profit_USD']
     excess = row['Excess_Profit']
-    
-    if score >= high_thresh and excess > 1.0:
+    total_profit = row['Total_Profit_USD']
+
+    # 고위험 + 수익이 높은 계정
+    if score >= high_thresh and (excess > 0.5 or total_profit > 1e5):
         return "고위험·고수익형 (조작 가능성 높음)"
-    elif score >= high_thresh and excess <= 0:
+    # 고위험인데 수익이 낮은 경우
+    elif score >= high_thresh and (excess <= 0.5 and total_profit <= 1e5):
         return "고위험·저수익형 (비효율적 조작 시도)"
-    elif score < 0 and excess > 1.0:
+    # 저위험 + 고수익
+    elif score < 0 and (excess > 0.5 or total_profit > 1e5):
         return "저위험·고수익형 (은밀형 조작 가능성)"
-    elif score < 0 and excess > 0.5:
+    # 저위험 + 중간수익
+    elif score < 0 and (excess > 0):
         return "저위험·중간수익형 (정상 혹은 우연형)"
     else:
         return "일반형 (특이행동 없음)"
 
+
 merged_sorted['해석'] = merged_sorted.apply(interpret, axis=1)
 
+# ======================================================
+# 14. 한글 열 이름 및 핵심 열만 출력
+# ======================================================
+merged_sorted_kor = merged_sorted.rename(columns={
+    'Rank': '순위',
+    'Funding_Score': '펀딩 점수',
+    'Risk_Level': '위험 등급',
+    'Total_Profit_USD': '총 수익 (USD)',
+    'Excess_Profit': '초과 수익',
+    '해석': '거래 유형 해석'
+})
 
-print("================================================================================")
-print("이상 거래 탐지 결과")
-print("================================================================================")
-print(merged_sorted[final_columns].head(20))
+core_columns_kor = ['순위', '펀딩 점수', '위험 등급', '총 수익 (USD)', '초과 수익', '거래 유형 해석']
+
+print("=====================================================================================================")
+print("이상 거래 탐지 결과 ")
+print("=====================================================================================================")
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', 0)
+print(merged_sorted_kor[core_columns_kor].head(20))
