@@ -309,3 +309,68 @@ print("✅ 통계 요약 저장 완료: pattern1_feature_statistics.csv")
 print("\n" + "=" * 80)
 print("분석 완료!")
 print("=" * 80)
+
+
+
+# ============================================================================
+# 이상치 계정 요약 추출
+# ============================================================================
+
+print("\n" + "=" * 80)
+print("이상치 계정 요약 생성")
+print("=" * 80)
+
+# 기준치 설정: 펀딩피 절댓값 95th 이상 or 펀딩 수익비중 90th 이상 or 펀딩시각 집중도 90th 이상
+funding_threshold = stats_1['95th percentile']
+timing_threshold = stats_3['90th percentile']
+profit_threshold = stats_4['90th percentile']
+
+# 계정별 피처 집계
+feature_df = pd.DataFrame({
+    'account_id': account_funding.index,
+    'funding_fee_abs': account_funding.values,
+    'funding_profit_ratio': funding_profit_series.values[:len(account_funding)],
+})
+
+# 보유시간, 펀딩시각 집중도 추가
+feature_df = feature_df.merge(mean_holding.rename('mean_holding_minutes'), on='account_id', how='left')
+account_timing = trade_df.groupby('account_id')['is_funding_time'].mean() * 100
+feature_df = feature_df.merge(account_timing.rename('funding_timing_ratio'), on='account_id', how='left')
+
+# 이상치 필터
+outlier_accounts = feature_df[
+    (feature_df['funding_fee_abs'] >= funding_threshold) |
+    (feature_df['funding_profit_ratio'] >= profit_threshold) |
+    (feature_df['funding_timing_ratio'] >= timing_threshold)
+].copy()
+
+# 점수 계산 (정규화 후 평균)
+for col in ['funding_fee_abs', 'funding_profit_ratio', 'funding_timing_ratio']:
+    feature_df[f'{col}_score'] = (feature_df[col] - feature_df[col].min()) / (feature_df[col].max() - feature_df[col].min())
+feature_df['funding_score'] = feature_df[['funding_fee_abs_score', 'funding_profit_ratio_score', 'funding_timing_ratio_score']].mean(axis=1)
+
+# 위험도 등급
+def risk_label(x):
+    if x > 0.6:
+        return "High"
+    elif x > 0.4:
+        return "Medium"
+    else:
+        return "Low"
+
+feature_df['risk_level'] = feature_df['funding_score'].apply(risk_label)
+
+# 이상치 상위 2개 추출
+top_outliers = feature_df.sort_values('funding_score', ascending=False).head(2)
+
+# 출력
+print(top_outliers[['account_id', 'funding_fee_abs', 'mean_holding_minutes',
+                    'funding_timing_ratio', 'funding_profit_ratio',
+                    'funding_score', 'risk_level']].to_string(index=False))
+
+# CSV 저장
+top_outliers[['account_id', 'funding_fee_abs', 'mean_holding_minutes',
+               'funding_timing_ratio', 'funding_profit_ratio',
+               'funding_score', 'risk_level']].to_csv('pattern1_outlier_accounts.csv',
+                                                      index=False, encoding='utf-8-sig')
+print("\n✅ 이상치 계정 저장 완료: pattern1_outlier_accounts.csv")

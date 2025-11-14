@@ -1,87 +1,129 @@
 import pandas as pd
 import numpy as np
+from scipy.stats import zscore
 
-# 데이터 로딩
-trade_df = pd.read_csv('data/Trade.csv')
-ip_df = pd.read_csv('data/IP.csv')
+# ============================================================
+# 1. 데이터 로딩
+# ============================================================
+trade_df = pd.read_csv("data/Trade.csv")
+ip_df = pd.read_csv("data/IP.csv")
 
-# 1. IP 공유 비율 (ip_shared_ratio)
-ip_account_counts = ip_df.groupby('ip')['account_id'].nunique()
-shared_ips = ip_account_counts[ip_account_counts > 1]
+# ============================================================
+# 2. 피처 계산
+# ============================================================
+ip_counts = ip_df.groupby("ip")["account_id"].nunique()
+shared_ip = ip_counts[ip_counts > 1].index
+account_ip_total = ip_df.groupby("account_id")["ip"].nunique()
+account_ip_shared = ip_df[ip_df["ip"].isin(shared_ip)].groupby("account_id")["ip"].nunique()
+ip_shared_ratio = (account_ip_shared / account_ip_total).fillna(0)
 
-# 2. 동시 거래율 (concurrent_trading_ratio)
-trade_df['ts_minute'] = pd.to_datetime(trade_df['ts']).dt.floor('1min')
+trade_df["ts_minute"] = pd.to_datetime(trade_df["ts"]).dt.floor("1min")
+trade_df["concurrent_count"] = trade_df.groupby(["ts_minute", "symbol"])["account_id"].transform("count")
+trade_df["is_concurrent"] = (trade_df["concurrent_count"] > 1).astype(int)
+concurrent_ratio = trade_df.groupby("account_id")["is_concurrent"].mean()
 
-concurrent_trades = trade_df.groupby(['ts_minute', 'symbol']).agg({
-    'account_id': lambda x: list(x.unique()),
-    'price': ['mean', 'std', 'count']
-}).reset_index()
+price_stats = trade_df.groupby(["ts_minute", "symbol"])["price"].agg(["mean", "std"]).reset_index()
+price_stats["price_cv"] = price_stats["std"] / price_stats["mean"]
+trade_df = trade_df.merge(price_stats[["ts_minute", "symbol", "price_cv"]], on=["ts_minute", "symbol"], how="left")
+price_cv = trade_df.groupby("account_id")["price_cv"].mean().fillna(0)
 
-concurrent_trades.columns = ['ts_minute', 'symbol', 'accounts', 'price_mean', 'price_std', 'trade_count']
-concurrent_trades['account_count'] = concurrent_trades['accounts'].apply(len)
+trade_df["leverage"] = trade_df["leverage"].fillna(1)
+leverage_mean = trade_df.groupby("account_id")["leverage"].mean()
 
-# 동시 거래가 2명 이상인 경우
-multi_account_trades = concurrent_trades[concurrent_trades['account_count'] >= 2]
+S_coordinated = np.sqrt(concurrent_ratio * (1 - price_cv.clip(0, 1)))
 
-# 3. 가격 유사도 (price_similarity)
-concurrent_trades['price_cv'] = concurrent_trades['price_std'] / concurrent_trades['price_mean']
-concurrent_trades['price_cv'] = concurrent_trades['price_cv'].fillna(0)
+# ============================================================
+# 4. 피처 통합
+# ============================================================
+merged = pd.DataFrame({
+    "account_id": leverage_mean.index,
+    "S_IP": ip_shared_ratio.reindex(leverage_mean.index, fill_value=0),
+    "S_concurrent": concurrent_ratio.reindex(leverage_mean.index, fill_value=0),
+    "S_price": price_cv.reindex(leverage_mean.index, fill_value=0),
+    "S_leverage": leverage_mean,
+    "S_coordinated": S_coordinated.reindex(leverage_mean.index, fill_value=0)
+})
 
-# 가격 유사도 1% 미만인 거래
-similar_price_trades = concurrent_trades[concurrent_trades['price_cv'] < 0.01]
+# ============================================================
+# 5~7. 표준화 및 가중합
+# ============================================================
+for col in ["S_IP", "S_concurrent", "S_price", "S_leverage", "S_coordinated"]:
+    merged[col + "_z"] = zscore(merged[col].replace([np.inf, -np.inf], 0))
 
-# 4. 레버리지 분석 (leverage)
-trade_df['leverage'] = trade_df['leverage'].fillna(1)  # 레버리지 결측치 처리
-account_leverage = trade_df.groupby('account_id')['leverage'].mean()
+weights = {
+    "S_IP_z": 0.25,
+    "S_concurrent_z": 0.25,
+    "S_price_z": 0.15,
+    "S_leverage_z": 0.10,
+    "S_coordinated_z": 0.25
+}
+merged["Organized_Score_raw"] = sum(merged[k] * w for k, w in weights.items())
+merged["Organized_Score"] = np.exp(merged["Organized_Score_raw"] / 2)
 
-# 5. 스코어 산출 (각 피처에 대한 점수 계산)
-# IP 공유 비율 (S_IP)
-def get_ip_score(shared_ratio):
-    if shared_ratio < 0.05:
-        return 0
-    elif 0.05 <= shared_ratio < 0.15:
-        return 0.5
+# ============================================================
+# 8. 리스크 등급
+# ============================================================
+high_thresh = merged["Organized_Score"].quantile(0.85)
+medium_thresh = merged["Organized_Score"].quantile(0.5)
+conditions = [
+    merged["Organized_Score"] >= high_thresh,
+    merged["Organized_Score"] >= medium_thresh
+]
+choices = ["High", "Medium"]
+merged["Risk_Level"] = np.select(conditions, choices, default="Low")
+
+# ============================================================
+# 9~13. 수익 계산
+# ============================================================
+pnl_list = []
+for (account_id, position_id), group in trade_df.groupby(["account_id", "position_id"]):
+    open_trades = group[group["openclose"] == "OPEN"]
+    close_trades = group[group["openclose"] == "CLOSE"]
+    if len(open_trades) > 0 and len(close_trades) > 0:
+        pnl = close_trades["amount"].sum() - open_trades["amount"].sum()
+        pnl_list.append({"account_id": account_id, "pnl": pnl})
+
+pnl_df = pd.DataFrame(pnl_list)
+account_pnl = pnl_df.groupby("account_id")["pnl"].sum()
+
+merged["Trading_PnL_USD"] = merged["account_id"].map(account_pnl).fillna(0)
+merged["Total_Profit_USD"] = merged["Trading_PnL_USD"]
+
+# ============================================================
+# 14. 평균 대비 초과 수익
+# ============================================================
+merged["Excess_Profit"] = zscore(merged["Total_Profit_USD"].fillna(0))
+
+# ============================================================
+# 15. 리스크-수익 비율
+# ============================================================
+merged["Risk_Reward_Ratio"] = merged["Total_Profit_USD"] / (merged["Organized_Score"].abs() + 1e-6)
+
+# ============================================================
+# 16. 자동 해석 (행동 유형)
+# ============================================================
+def interpret(row):
+    if row["Risk_Level"] == "High" and row["Excess_Profit"] < 0:
+        return "고위험·저수익형 (비효율적 조작 시도)"
+    elif row["Risk_Level"] == "High" and row["Excess_Profit"] >= 0:
+        return "고위험·고수익형 (공동조작 성공 가능성)"
+    elif row["Risk_Level"] == "Medium" and row["Excess_Profit"] >= 0.5:
+        return "중위험·고수익형 (은밀한 협조 가능성)"
+    elif row["Risk_Level"] == "Low" and row["Excess_Profit"] > 1:
+        return "저위험·고수익형 (은폐형 조직 거래)"
     else:
-        return 1
+        return "일반형 (특이행동 없음)"
 
-# 동시 거래 비율 (S_concurrent)
-def get_concurrent_score(concurrent_ratio):
-    if concurrent_ratio < 0.3:
-        return 0
-    elif 0.3 <= concurrent_ratio < 0.5:
-        return 0.5
-    else:
-        return 1
+merged["해석"] = merged.apply(interpret, axis=1)
 
-# 가격 유사도 (S_price)
-def get_price_score(price_cv):
-    if price_cv < 0.01:
-        return 1
-    elif price_cv < 0.05:
-        return 0.5
-    else:
-        return 0
-
-# 레버리지 (S_leverage)
-def get_leverage_score(leverage):
-    if leverage < 10:
-        return 0
-    elif 10 <= leverage < 30:
-        return 0.5
-    else:
-        return 1
-
-# 최종 스코어 계산 (Organized_Score)
-organized_score = []
-for i in range(len(multi_account_trades)):
-    ip_score = get_ip_score(shared_ips.iloc[i])
-    concurrent_score = get_concurrent_score(concurrent_trades.iloc[i])
-    price_score = get_price_score(concurrent_trades.iloc[i])
-    leverage_score = get_leverage_score(account_leverage.iloc[i])
-    
-    total_score = 0.30 * ip_score + 0.35 * concurrent_score + 0.25 * price_score + 0.10 * leverage_score
-    organized_score.append(total_score)
-
-# 최종 스코어 결과
-multi_account_trades['final_score'] = organized_score
-multi_account_trades['risk_level'] = pd.cut(multi_account_trades['final_score'], bins=[-np.inf, 0.3, 0.6, np.inf], labels=['Low', 'Medium', 'High'])
+# ============================================================
+# 17. 결과 출력
+# ============================================================
+merged_sorted = merged.sort_values("Organized_Score", ascending=False).reset_index(drop=True)
+print("=" * 80)
+print("조직적 거래 탐지 결과 (Z-score + 가중치 + 비선형 강조 + 수익 분석 + 해석)")
+print("=" * 80)
+print(merged_sorted[[
+    "account_id", "Organized_Score", "Risk_Level",
+    "Total_Profit_USD", "Excess_Profit", "Risk_Reward_Ratio", "해석"
+]].head(20))
