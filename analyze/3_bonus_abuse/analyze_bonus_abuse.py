@@ -568,3 +568,38 @@ print("\n임계값:")
 print("  - Low Risk: Score < 0.3")
 print("  - Medium Risk: 0.3 ≤ Score < 0.6")
 print("  - High Risk: Score ≥ 0.6")
+
+
+
+# ================================================================================
+# [추가] 거래 활동 여부 시각화 (비사용 피처)
+# ================================================================================
+print("\n" + "=" * 100)
+print("[비사용 피처] 거래 활동 여부 시각화")
+print("=" * 100)
+
+# 거래 활동 여부 통계 재사용
+has_trades_count = activity_analysis['has_trades'].sum()
+no_trades_count = (~activity_analysis['has_trades']).sum()
+
+# 모든 계정이 거래 있음 → 변별력 없음
+if no_trades_count == 0:
+    print("모든 계정에서 거래 활동이 확인됨 (100%) → 변별력 없음, 분석 제외")
+
+# 시각화
+plt.figure(figsize=(6, 4))
+plt.bar(['거래 있음', '거래 없음'], [has_trades_count, no_trades_count],
+        color=['green', 'red'], edgecolor='black', alpha=0.8)
+plt.title('거래 활동 여부', fontsize=13, fontweight='bold')
+plt.ylabel('계정 수', fontsize=11)
+plt.grid(axis='y', alpha=0.3)
+for i, v in enumerate([has_trades_count, no_trades_count]):
+    plt.text(i, v + 0.2, f'{v} ({v/(has_trades_count+no_trades_count)*100:.1f}%)',
+             ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+plt.tight_layout()
+plt.savefig('output/bonus_abuse/unused_feature_trade_activity.png', dpi=300, bbox_inches='tight')
+plt.close()  
+plt.show()
+print("✅ 비사용 피처 그래프 저장 완료: output/bonus_abuse/unused_feature_trade_activity.png")
+print("   사유: 거래 활동 여부는 100% 거래 있음 → 변별력 없음")

@@ -1,0 +1,65 @@
+timestamp,account_id,reviewed,pattern,risk_level,metric_value,metric_name,description
+2025-10-31 20:00:38.588185,A_06d5bd3da9,False,Pattern2_OrganizedTrading,SUSPICIOUS,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_0bfb0b4311,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_0e72128b0d,False,Pattern1_FundingFeeArbitrage,SUSPICIOUS,14.221206993947536,funding_profit_ratio,펀딩피 수익 비중: 14.22%
+2025-10-31 20:00:38.588185,A_1a7c006b71,False,Pattern2_OrganizedTrading,SUSPICIOUS,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_1f97e16953,False,Pattern1_FundingFeeArbitrage,HIGH,2.0834922679020913,funding_profit_ratio,펀딩피 수익 비중: 2.08%
+2025-10-31 20:00:38.588185,A_1f97e16953,False,Pattern2_OrganizedTrading,HIGH,3.0,ip_shared_count,IP 공유 계정 수: 3
+2025-10-31 20:00:38.588185,A_26ffea8fd9,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_26ffea8fd9,False,Pattern3_BonusAbuse,HIGH,243.54482001104577,total_reward,총 보너스 수령액: $243.54
+2025-10-31 20:00:38.588185,A_27fd29fd55,False,Pattern2_OrganizedTrading,HIGH,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_2db64f326b,False,Pattern1_FundingFeeArbitrage,HIGH,13.563535487413795,funding_profit_ratio,펀딩피 수익 비중: 13.56%
+2025-10-31 20:00:38.588185,A_2db64f326b,False,Pattern3_BonusAbuse,SUSPICIOUS,263.123581851044,total_reward,총 보너스 수령액: $263.12
+2025-10-31 20:00:38.588185,A_3cab2969e5,False,Pattern1_FundingFeeArbitrage,SUSPICIOUS,0.175664676154703,funding_profit_ratio,펀딩피 수익 비중: 0.18%
+2025-10-31 20:00:38.588185,A_3cab2969e5,False,Pattern2_OrganizedTrading,SUSPICIOUS,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_3cfd9478f0,False,Pattern2_OrganizedTrading,HIGH,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_4081f88bb0,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_4081f88bb0,False,Pattern3_BonusAbuse,HIGH,40.398781979999995,total_reward,총 보너스 수령액: $40.40
+2025-10-31 20:00:38.588185,A_48fbd03d61,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_48fbd03d61,False,Pattern3_BonusAbuse,HIGH,106.0,total_reward,총 보너스 수령액: $106.00
+2025-10-31 20:00:38.588185,A_4943ad62b4,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_4943ad62b4,False,Pattern3_BonusAbuse,HIGH,37.42156931674209,total_reward,총 보너스 수령액: $37.42
+2025-10-31 20:00:38.588185,A_55021b4ae2,False,Pattern3_BonusAbuse,SUSPICIOUS,534.89877,total_reward,총 보너스 수령액: $534.90
+2025-10-31 20:00:38.588185,A_59b90616d6,False,Pattern2_OrganizedTrading,HIGH,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_6b3a8b213d,False,Pattern1_FundingFeeArbitrage,HIGH,,funding_profit_ratio,펀딩피 수익 비중: nan%
+2025-10-31 20:00:38.588185,A_6b3a8b213d,False,Pattern2_OrganizedTrading,HIGH,3.0,ip_shared_count,IP 공유 계정 수: 3
+2025-10-31 20:00:38.588185,A_7620582c70,False,Pattern1_FundingFeeArbitrage,HIGH,,funding_profit_ratio,펀딩피 수익 비중: nan%
+2025-10-31 20:00:38.588185,A_78e950c1a2,False,Pattern1_FundingFeeArbitrage,SUSPICIOUS,0.0656752762545743,funding_profit_ratio,펀딩피 수익 비중: 0.07%
+2025-10-31 20:00:38.588185,A_78e950c1a2,False,Pattern2_OrganizedTrading,SUSPICIOUS,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_7e27164ab6,False,Pattern3_BonusAbuse,SUSPICIOUS,177.79001880157895,total_reward,총 보너스 수령액: $177.79
+2025-10-31 20:00:38.588185,A_8413984c30,False,Pattern1_FundingFeeArbitrage,SUSPICIOUS,0.36231615117882177,funding_profit_ratio,펀딩피 수익 비중: 0.36%
+2025-10-31 20:00:38.588185,A_8413984c30,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_853f70d58b,False,Pattern1_FundingFeeArbitrage,SUSPICIOUS,0.06387805763513073,funding_profit_ratio,펀딩피 수익 비중: 0.06%
+2025-10-31 20:00:38.588185,A_853f70d58b,False,Pattern2_OrganizedTrading,HIGH,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_8860be39b3,False,Pattern1_FundingFeeArbitrage,SUSPICIOUS,0.29969128645315907,funding_profit_ratio,펀딩피 수익 비중: 0.30%
+2025-10-31 20:00:38.588185,A_8860be39b3,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_946b028740,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_9a5e1e7fac,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_ae270b7bf6,False,Pattern3_BonusAbuse,SUSPICIOUS,163.50942650000002,total_reward,총 보너스 수령액: $163.51
+2025-10-31 20:00:38.588185,A_c462ca9c6b,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_c462ca9c6b,False,Pattern3_BonusAbuse,HIGH,95.71786964226135,total_reward,총 보너스 수령액: $95.72
+2025-10-31 20:00:38.588185,A_c668740478,False,Pattern2_OrganizedTrading,SUSPICIOUS,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_c91db6cabf,False,Pattern3_BonusAbuse,HIGH,534.9120995000001,total_reward,총 보너스 수령액: $534.91
+2025-10-31 20:00:38.588185,A_cab220ef3c,False,Pattern1_FundingFeeArbitrage,HIGH,0.5266746896444293,funding_profit_ratio,펀딩피 수익 비중: 0.53%
+2025-10-31 20:00:38.588185,A_cab220ef3c,False,Pattern3_BonusAbuse,HIGH,1773.536295645769,total_reward,총 보너스 수령액: $1773.54
+2025-10-31 20:00:38.588185,A_cf3fcea289,False,Pattern1_FundingFeeArbitrage,SUSPICIOUS,23.585025407073736,funding_profit_ratio,펀딩피 수익 비중: 23.59%
+2025-10-31 20:00:38.588185,A_d444580218,False,Pattern1_FundingFeeArbitrage,HIGH,24.00542072876913,funding_profit_ratio,펀딩피 수익 비중: 24.01%
+2025-10-31 20:00:38.588185,A_d444580218,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_d444580218,False,Pattern3_BonusAbuse,HIGH,336.89586676478524,total_reward,총 보너스 수령액: $336.90
+2025-10-31 20:00:38.588185,A_dcd87c6c96,False,Pattern2_OrganizedTrading,HIGH,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_dcd87c6c96,False,Pattern3_BonusAbuse,HIGH,584.82338025,total_reward,총 보너스 수령액: $584.82
+2025-10-31 20:00:38.588185,A_e27beda014,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_e27beda014,False,Pattern3_BonusAbuse,HIGH,13.9435062,total_reward,총 보너스 수령액: $13.94
+2025-10-31 20:00:38.588185,A_e7205c325a,False,Pattern2_OrganizedTrading,HIGH,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_e7205c325a,False,Pattern3_BonusAbuse,HIGH,584.7787135833333,total_reward,총 보너스 수령액: $584.78
+2025-10-31 20:00:38.588185,A_e8e9d04acc,False,Pattern1_FundingFeeArbitrage,SUSPICIOUS,0.7266845005330954,funding_profit_ratio,펀딩피 수익 비중: 0.73%
+2025-10-31 20:00:38.588185,A_e8e9d04acc,False,Pattern2_OrganizedTrading,SUSPICIOUS,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_e95b2c5030,False,Pattern1_FundingFeeArbitrage,SUSPICIOUS,,funding_profit_ratio,펀딩피 수익 비중: nan%
+2025-10-31 20:00:38.588185,A_e95b2c5030,False,Pattern2_OrganizedTrading,HIGH,3.0,ip_shared_count,IP 공유 계정 수: 3
+2025-10-31 20:00:38.588185,A_ebdb869fd3,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_ebdb869fd3,False,Pattern3_BonusAbuse,SUSPICIOUS,159.991358,total_reward,총 보너스 수령액: $159.99
+2025-10-31 20:00:38.588185,A_ef035876f1,False,Pattern2_OrganizedTrading,SUSPICIOUS,1.0,ip_shared_count,IP 공유 계정 수: 1
+2025-10-31 20:00:38.588185,A_f2ab53d645,False,Pattern3_BonusAbuse,SUSPICIOUS,208.98880080333333,total_reward,총 보너스 수령액: $208.99
+2025-10-31 20:00:38.588185,A_f96ede8d34,False,Pattern1_FundingFeeArbitrage,SUSPICIOUS,24.80425757757318,funding_profit_ratio,펀딩피 수익 비중: 24.80%
+2025-10-31 20:00:38.588185,A_f96ede8d34,False,Pattern2_OrganizedTrading,SUSPICIOUS,2.0,ip_shared_count,IP 공유 계정 수: 2
+2025-10-31 20:00:38.588185,A_f96ede8d34,False,Pattern3_BonusAbuse,HIGH,796.0282943435294,total_reward,총 보너스 수령액: $796.03
